@@ -43,11 +43,19 @@ export function renderDriveModal(container) {
       }).join('')}
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <button class="btn btn-secondary btn-sm" id="btn-simulate-new-usb">
-        <i data-lucide="plus" style="width:14px;"></i> Add Virtual Drive
-      </button>
-      <button class="btn btn-primary btn-sm" id="btn-confirm-modal">OK</button>
+    <div style="display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+      <input type="file" id="real-usb-file-input" webkitdirectory directory style="display:none;" />
+      
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-primary btn-sm" id="btn-connect-real-usb" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); border:none;">
+          <i data-lucide="hard-drive-upload" style="width:14px;"></i> Gerçek USB / Klasör Bağla
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btn-simulate-new-usb">
+          <i data-lucide="plus" style="width:14px;"></i> Sanal Sürücü Ekle
+        </button>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" id="btn-confirm-modal">Tamam (OK)</button>
     </div>
   `;
 
@@ -65,6 +73,115 @@ export function renderDriveModal(container) {
       store.setActiveDrive(id);
       overlay?.classList.add('hidden');
     });
+  });
+
+  // Connect Real USB Drive via Web File System Access API or Fallback Input
+  const handleRealFolderFiles = async (folderName, fileList) => {
+    const realFiles = [];
+    let usedBytes = 0;
+
+    for (let i = 0; i < Math.min(fileList.length, 300); i++) {
+      const file = fileList[i];
+      usedBytes += file.size;
+      let sizeStr = (file.size / 1024).toFixed(1) + ' KB';
+      if (file.size > 1024 * 1024) sizeStr = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+      if (file.size > 1024 * 1024 * 1024) sizeStr = (file.size / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+
+      realFiles.push({
+        name: file.webkitRelativePath || file.name,
+        type: file.name.split('.').pop() || 'file',
+        size: sizeStr
+      });
+    }
+
+    const driveName = (folderName || 'GERÇEK_USB').toUpperCase();
+    const newDrive = {
+      id: 'real_usb_' + Date.now(),
+      name: `💾 ${driveName}`,
+      letter: 'LIVE',
+      totalBytes: Math.max(usedBytes * 1.5, 32000000000),
+      usedBytes: usedBytes,
+      filesystem: 'Yerel USB / Web FS',
+      isVentoyInstalled: false,
+      ventoyVersion: null,
+      isEncrypted: false,
+      isReal: true,
+      files: realFiles
+    };
+
+    state.drives.push(newDrive);
+    store.setActiveDrive(newDrive.id);
+    store.addLog('success', `🟢 Gerçek USB Klasörü Bağlandı: ${driveName} (${realFiles.length} dosya tarandı)`);
+    overlay?.classList.add('hidden');
+  };
+
+  document.getElementById('btn-connect-real-usb')?.addEventListener('click', async () => {
+    if ('showDirectoryPicker' in window) {
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        const realFiles = [];
+        let usedBytes = 0;
+
+        async function scanDir(handle, path = '') {
+          for await (const entry of handle.values()) {
+            if (realFiles.length >= 300) break;
+            const currentPath = path ? `${path}/${entry.name}` : entry.name;
+            if (entry.kind === 'file') {
+              try {
+                const file = await entry.getFile();
+                usedBytes += file.size;
+                let sizeStr = (file.size / 1024).toFixed(1) + ' KB';
+                if (file.size > 1024 * 1024) sizeStr = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+                if (file.size > 1024 * 1024 * 1024) sizeStr = (file.size / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+
+                realFiles.push({
+                  name: currentPath,
+                  type: entry.name.split('.').pop() || 'file',
+                  size: sizeStr
+                });
+              } catch (err) {}
+            } else if (entry.kind === 'directory' && !entry.name.startsWith('.')) {
+              await scanDir(entry, currentPath);
+            }
+          }
+        }
+
+        await scanDir(dirHandle);
+
+        const driveName = (dirHandle.name || 'GERÇEK_USB').toUpperCase();
+        const newDrive = {
+          id: 'real_usb_' + Date.now(),
+          name: `💾 ${driveName}`,
+          letter: 'LIVE',
+          totalBytes: Math.max(usedBytes * 1.5, 32000000000),
+          usedBytes: usedBytes,
+          filesystem: 'Yerel USB / Live FS',
+          isVentoyInstalled: false,
+          ventoyVersion: null,
+          isEncrypted: false,
+          isReal: true,
+          files: realFiles
+        };
+
+        state.drives.push(newDrive);
+        store.setActiveDrive(newDrive.id);
+        store.addLog('success', `🟢 Gerçek USB Diski Bağlandı: ${driveName} (${realFiles.length} dosya canlı okundu)`);
+        overlay?.classList.add('hidden');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          document.getElementById('real-usb-file-input')?.click();
+        }
+      }
+    } else {
+      document.getElementById('real-usb-file-input')?.click();
+    }
+  });
+
+  document.getElementById('real-usb-file-input')?.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const folderName = e.target.files[0].webkitRelativePath.split('/')[0] || 'GERÇEK_USB';
+      handleRealFolderFiles(folderName, Array.from(e.target.files));
+    }
   });
 
   document.getElementById('btn-simulate-new-usb')?.addEventListener('click', () => {
