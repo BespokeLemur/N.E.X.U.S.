@@ -36,13 +36,24 @@ mkdir "%TARGET%Sifrelerim_Vault" 2>nul
 echo [2/3] N.E.X.U.S. derlenmis dosyalari USB'ye kopyalaniyor...
 xcopy /E /Y /I "dist\*" "%TARGET%N.E.X.U.S\"
 
+echo [3/3] USB Baslatma scripti olusturuluyor...
+(
+  echo @echo off
+  echo title N.E.X.U.S. USB Launcher
+  echo color 0A
+  echo echo ===================================================
+  echo echo [N.E.X.U.S.] USB Arayuzu Baslatiliyor...
+  echo echo ===================================================
+  echo powershell -NoProfile -Command "Start-Process '%%~dp0index.html'"
+) > "%TARGET%N.E.X.U.S\N.E.X.U.S_BASLAT.bat"
+
 echo.
 echo =======================================================
 echo [TEBRIKLER] N.E.X.U.S. USB Belleginize Basariyla Yuklendi!
 echo =======================================================
 echo.
-echo USB Belleginizdeki "%TARGET%N.E.X.U.S\index.html" dosyasina
-echo cift tiklayarak her yerde kullanabilirsiniz.
+echo USB Belleginizdeki "%TARGET%N.E.X.U.S\N.E.X.U.S_BASLAT.bat"
+echo veya "index.html" dosyasina cift tiklayarak kullanabilirsiniz.
 echo.
 pause
 exit
