@@ -1,140 +1,79 @@
-// N.E.X.U.S. - Central Application State Management (v3.1 i18n Multi-Language Enabled)
+// N.E.X.U.S. - Central Application State Management (v3.2 Production Mode)
 
-const STORAGE_KEY = 'nexus_state_v3_1';
+const STORAGE_KEY = 'nexus_state_v3_2_prod';
 
 const defaultState = {
   activeTab: 'dashboard', 
   activeProfile: 'web', 
   activeTheme: 'cyberpunk',
   activeLang: 'tr', // 'tr', 'en', 'de', 'es', 'fr'
-  activeDriveId: 'usb1',
+  activeDriveId: null,
   isWriteProtected: false,
   soundFxEnabled: true,
   
-  drives: [
-    {
-      id: 'usb1',
-      name: 'NEXUS_EXTREME_64',
-      letter: 'E:',
-      totalBytes: 64000000000,
-      usedBytes: 31200000000,
-      filesystem: 'exFAT / Ventoy Bootable',
-      isVentoyInstalled: true,
-      ventoyVersion: 'v1.0.99-nexus',
-      isEncrypted: false,
-      files: [
-        { name: 'ventoy/ventoy.json', type: 'config', size: '2.4 KB' },
-        { name: 'ISO/ubuntu-24.04-desktop-amd64.iso', type: 'iso', size: '5.8 GB' },
-        { name: 'ISO/archlinux-2026.08.01-x86_64.iso', type: 'iso', size: '1.1 GB' },
-        { name: 'ISO/rescuezilla-2.5.1-64bit.iso', type: 'iso', size: '1.2 GB' },
-        { name: 'Portable/VSCode-Portable/code.exe', type: 'exe', size: '120 MB' },
-        { name: 'Portable/Git-Portable/cmd/git.exe', type: 'exe', size: '85 MB' },
-        { name: 'Portable/NodeJS-Portable/node.exe', type: 'exe', size: '65 MB' },
-        { name: 'Dotfiles/.zshrc', type: 'config', size: '4 KB' },
-        { name: 'Dotfiles/.gitconfig', type: 'config', size: '1 KB' },
-        { name: 'AI_Node/ollama_portable.exe', type: 'exe', size: '45 MB' },
-        { name: 'AI_Node/models/qwen2.5-coder-1.5b.gguf', type: 'ai', size: '1.4 GB' },
-        { name: 'Docker_Cache/postgres-alpine.tar', type: 'docker', size: '85 MB' },
-        { name: 'Vault/vault_projects.aes', type: 'vault', size: '4.2 GB' },
-        { name: 'SSH_Keys/id_ed25519.aes', type: 'vault', size: '2 KB' },
-        { name: 'launch_nexus_env.bat', type: 'script', size: '1.2 KB' },
-        { name: 'launch_nexus_env.sh', type: 'script', size: '1.1 KB' }
-      ]
-    },
-    {
-      id: 'usb2',
-      name: 'NEXUS_DEV_VAULT',
-      letter: 'F:',
-      totalBytes: 128000000000,
-      usedBytes: 12000000000,
-      filesystem: 'NTFS',
-      isVentoyInstalled: false,
-      ventoyVersion: null,
-      isEncrypted: false,
-      files: [
-        { name: 'Backup/project_alpha.zip', type: 'archive', size: '12 GB' }
-      ]
-    }
-  ],
+  drives: [],
 
   portableTools: [
-    { id: 'vscode', name: 'VS Code Portable', category: 'IDE / Editor', version: '1.92.2', size: '340 MB', description: 'Eklentiler ve kişisel ayarlarınızla birlikte taşınabilir Kod Editörü.', installed: true, icon: 'code-xml', badge: 'Popular', execPath: 'Portable/VSCode-Portable/Code.exe' },
-    { id: 'git', name: 'Git Portable', category: 'Version Control', version: '2.46.0', size: '180 MB', description: 'Komut satırı ve GUI araçları içeren tam taşınabilir Git paketi.', installed: true, icon: 'git-branch', badge: 'Essential', execPath: 'Portable/Git-Portable/git-cmd.exe' },
-    { id: 'nodejs', name: 'Node.js Portable', category: 'Runtime', version: 'v22.6.0 (LTS)', size: '120 MB', description: 'NPM ve npx paketi dahil bağımsız JavaScript çalıştırma ortamı.', installed: true, icon: 'box', badge: 'LTS', execPath: 'Portable/NodeJS-Portable/node.exe' },
+    { id: 'vscode', name: 'VS Code Portable', category: 'IDE / Editor', version: '1.92.2', size: '340 MB', description: 'Eklentiler ve kişisel ayarlarınızla birlikte taşınabilir Kod Editörü.', installed: false, icon: 'code-xml', badge: 'Popular', execPath: 'Portable/VSCode-Portable/Code.exe' },
+    { id: 'git', name: 'Git Portable', category: 'Version Control', version: '2.46.0', size: '180 MB', description: 'Komut satırı ve GUI araçları içeren tam taşınabilir Git paketi.', installed: false, icon: 'git-branch', badge: 'Essential', execPath: 'Portable/Git-Portable/git-cmd.exe' },
+    { id: 'nodejs', name: 'Node.js Portable', category: 'Runtime', version: 'v22.6.0 (LTS)', size: '120 MB', description: 'NPM ve npx paketi dahil bağımsız JavaScript çalıştırma ortamı.', installed: false, icon: 'box', badge: 'LTS', execPath: 'Portable/NodeJS-Portable/node.exe' },
     { id: 'python', name: 'Python Portable (Embedded)', category: 'Runtime', version: '3.12.5', size: '95 MB', description: 'Pip ve sanal ortam destekli taşınabilir Python yorumlayıcısı.', installed: false, icon: 'terminal', badge: 'Recommended', execPath: 'Portable/Python-Portable/python.exe' },
-    { id: 'sqlite', name: 'DB Browser for SQLite', category: 'Database', version: '3.12.2', size: '45 MB', description: 'SQLite veritabanlarını oluşturmak ve düzenlemek için hafif GUI.', installed: true, icon: 'database', badge: 'Tool', execPath: 'Portable/SQLiteBrowser/sqlitebrowser.exe' },
+    { id: 'sqlite', name: 'DB Browser for SQLite', category: 'Database', version: '3.12.2', size: '45 MB', description: 'SQLite veritabanlarını oluşturmak ve düzenlemek için hafif GUI.', installed: false, icon: 'database', badge: 'Tool', execPath: 'Portable/SQLiteBrowser/sqlitebrowser.exe' },
     { id: 'bruno', name: 'Bruno / Postman Lite', category: 'API Client', version: '1.24.0', size: '80 MB', description: 'Çevrimdışı, gizlilik odaklı taşınabilir REST & GraphQL API istemcisi.', installed: false, icon: 'send', badge: 'API', execPath: 'Portable/Bruno/bruno.exe' },
-    { id: 'browser_dev', name: 'Chromium DevTools Portable', category: 'Browser', version: '128.0', size: '220 MB', description: 'React/Vue/Redux DevTools eklentileri önceden yüklü gizli taşınabilir tarayıcı.', installed: true, icon: 'globe', badge: 'Browser', execPath: 'Portable/Chromium-Dev/chrome.exe' },
+    { id: 'browser_dev', name: 'Chromium DevTools Portable', category: 'Browser', version: '128.0', size: '220 MB', description: 'React/Vue/Redux DevTools eklentileri önceden yüklü gizli taşınabilir tarayıcı.', installed: false, icon: 'globe', badge: 'Browser', execPath: 'Portable/Chromium-Dev/chrome.exe' },
     { id: 'rust', name: 'Rustup & Cargo Portable', category: 'Compiler', version: '1.80.1', size: '420 MB', description: 'Sistem dili geliştirme için Rust derleyici ve kütüphane kiti.', installed: false, icon: 'cpu', badge: 'Advanced', execPath: 'Portable/Rust/cargo.exe' }
   ],
 
   aiModels: [
-    { id: 'qwen-coder', name: 'Qwen2.5-Coder 1.5B (GGUF)', size: '1.4 GB', vram: '2.5 GB RAM', downloaded: true, description: 'C++, Python, JavaScript ve Rust için optimize edilmiş çevrimdışı yapay zeka kod modeli.' },
+    { id: 'qwen-coder', name: 'Qwen2.5-Coder 1.5B (GGUF)', size: '1.4 GB', vram: '2.5 GB RAM', downloaded: false, description: 'C++, Python, JavaScript ve Rust için optimize edilmiş çevrimdışı yapay zeka kod modeli.' },
     { id: 'phi3-mini', name: 'Phi-3 Mini Instruct 3.8B', size: '2.2 GB', vram: '4.0 GB RAM', downloaded: false, description: 'Microsoft yapımı genel mantık ve algoritma anlatım modeli.' },
     { id: 'deepseek-coder', name: 'DeepSeek-Coder 1.3B Q4', size: '980 MB', vram: '1.8 GB RAM', downloaded: false, description: 'Hızlı kod üretimi ve hata tespiti için aşırı hafif model.' }
   ],
 
   dockerImages: [
-    { id: 'postgres', name: 'postgres:16-alpine', category: 'Database', size: '85 MB', cached: true },
-    { id: 'redis', name: 'redis:7-alpine', category: 'Cache', size: '32 MB', cached: true },
+    { id: 'postgres', name: 'postgres:16-alpine', category: 'Database', size: '85 MB', cached: false },
+    { id: 'redis', name: 'redis:7-alpine', category: 'Cache', size: '32 MB', cached: false },
     { id: 'nginx', name: 'nginx:alpine', category: 'Web Server', size: '25 MB', cached: false },
     { id: 'mongodb', name: 'mongo:7.0', category: 'NoSQL DB', size: '210 MB', cached: false }
   ],
 
-  dotfiles: [
-    { name: '.gitconfig', target: '~/.gitconfig', synced: true, content: '[user]\n  name = N.E.X.U.S. Engineer\n  email = dev@nexus.io\n[alias]\n  co = checkout\n  st = status' },
-    { name: '.zshrc', target: '~/.zshrc', synced: true, content: 'export PATH="/Volumes/NEXUS/Portable:$PATH"\nalias ll="ls -la"\nplugins=(git docker node)' },
-    { name: 'starship.toml', target: '~/.config/starship.toml', synced: true, content: '[character]\nsuccess_symbol = "[⚡](bold cyan)"' }
-  ],
-
-  p2pPeers: [
-    { id: 'p1', name: 'Nexus-Node-Alex (192.168.1.42)', status: 'Online', bytesShared: '1.4 GB' },
-    { id: 'p2', name: 'Nexus-Node-Sarah (192.168.1.18)', status: 'Online', bytesShared: '850 MB' }
-  ],
+  dotfiles: [],
+  p2pPeers: [],
 
   sbomAudits: [
     { pkg: 'express', version: '4.19.2', license: 'MIT', status: 'COMPLIANT', vuln: '0 Low' },
     { pkg: 'jsonwebtoken', version: '9.0.2', license: 'MIT', status: 'COMPLIANT', vuln: '0 Low' },
-    { pkg: 'lodash', version: '4.17.21', license: 'MIT', status: 'COMPLIANT', vuln: '0 Low' },
     { pkg: 'crypto-js', version: '4.2.0', license: 'MIT', status: 'COMPLIANT', vuln: '0 Low' }
   ],
 
   productivityStats: {
-    totalHoursCoded: '142.5 Saat',
-    commitsMade: 84,
-    topLanguage: 'TypeScript / Rust',
+    totalHoursCoded: '0 Saat',
+    commitsMade: 0,
+    topLanguage: 'Henüz Seçilmedi',
     sessionTraceCleaned: true
   },
 
-  sshKeys: [
-    { id: 'k1', label: 'github_deploy_key', type: 'ED25519', fingerPrint: 'SHA256:8f3a...91b2', status: 'Encrypted' },
-    { id: 'k2', label: 'aws_production_server', type: 'RSA 4096', fingerPrint: 'SHA256:1a4c...72d0', status: 'Encrypted' }
-  ],
-
+  sshKeys: [],
   benchmarkResult: null,
+
   cloudSyncAccounts: {
-    githubGist: { connected: true, username: 'nexus-dev', lastSync: '2026-09-08 12:40' },
-    cloudflareR2: { connected: true, bucket: 'nexus-vault-backup', lastSync: '2026-09-07 19:20' },
-    awsS3: { connected: false, bucket: null, lastSync: 'Never' }
+    githubGist: { connected: false, username: null, lastSync: 'Hiç' },
+    cloudflareR2: { connected: false, bucket: null, lastSync: 'Hiç' },
+    awsS3: { connected: false, bucket: null, lastSync: 'Hiç' }
   },
 
-  vaultProjects: [
-    { id: 'v1', name: 'shot-hub-core', path: 'Vault/shot-hub-core.aes', size: '1.8 GB', lastBackup: '2026-09-08 11:30', status: 'Encrypted (AES-256)', encrypted: true },
-    { id: 'v2', name: 'fintech-microservices', path: 'Vault/fintech-microservices.aes', size: '2.4 GB', lastBackup: '2026-09-07 18:45', status: 'Encrypted (AES-256)', encrypted: true }
-  ],
+  vaultProjects: [],
 
   isoHubItems: [
-    { id: 'ubuntu-dev', name: 'Ubuntu 24.04 LTS Dev-Edition', category: 'Linux Desktop', size: '5.8 GB', description: 'Docker, VS Code, Git, C++ ve Python geliştirme araçları önceden yüklü canlı imaj.', downloaded: true, progress: 100, sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
-    { id: 'arch-linux', name: 'Arch Linux Dev Setup', category: 'Minimal Linux', size: '1.1 GB', description: 'En güncel çekirdek ve özel Hyprland geliştirici yapılandırması.', downloaded: true, progress: 100, sha256: 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' },
+    { id: 'ubuntu-dev', name: 'Ubuntu 24.04 LTS Dev-Edition', category: 'Linux Desktop', size: '5.8 GB', description: 'Docker, VS Code, Git, C++ ve Python geliştirme araçları önceden yüklü canlı imaj.', downloaded: false, progress: 0, sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+    { id: 'arch-linux', name: 'Arch Linux Dev Setup', category: 'Minimal Linux', size: '1.1 GB', description: 'En güncel çekirdek ve özel Hyprland geliştirici yapılandırması.', downloaded: false, progress: 0, sha256: 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' },
     { id: 'kali-sec', name: 'Kali Linux CyberSec Pack', category: 'Security & Audit', size: '4.1 GB', description: 'Siber güvenlik, sızma testleri ve kod analizi araçları içeren canlı ISO.', downloaded: false, progress: 0, sha256: '7b8b965ad4bca0e41ab51de7b31363a1fa49e564164b11e087459b3a32252a12' },
-    { id: 'rescuezilla', name: 'Rescuezilla System Recovery', category: 'Diagnostic', size: '1.2 GB', description: 'Disk imajı alma, bölüm kopyalama ve çökertilmiş sistem kurtarma aracı.', downloaded: true, progress: 100, sha256: '3f786850e387550fdab836ed7e6dc881de23001b70e470b7528328659d57a2f1' }
+    { id: 'rescuezilla', name: 'Rescuezilla System Recovery', category: 'Diagnostic', size: '1.2 GB', description: 'Disk imajı alma, bölüm kopyalama ve çökertilmiş sistem kurtarma aracı.', downloaded: false, progress: 0, sha256: '3f786850e387550fdab836ed7e6dc881de23001b70e470b7528328659d57a2f1' }
   ],
 
   hostAuditResult: null,
   terminalLogs: [
-    { time: '12:51:02', level: 'info', msg: 'N.E.X.U.S. (Native Environment for Xero-trace Usb Systems) v3.1 i18n initialized.' },
-    { time: '12:51:03', level: 'success', msg: 'Drive NEXUS_EXTREME_64 (E:) detected [Ventoy v1.0.99].' },
-    { time: '12:51:04', level: 'info', msg: 'Multi-Language i18n Engine Active (TR, EN, DE, ES, FR).' }
+    { time: new Date().toLocaleTimeString('tr-TR', { hour12: false }), level: 'success', msg: 'N.E.X.U.S. v3.2 Production Mode Initialized.' }
   ]
 };
 

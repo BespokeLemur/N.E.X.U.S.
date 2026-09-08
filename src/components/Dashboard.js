@@ -21,20 +21,19 @@ const moduleCards = [
   { id: 'retro_games',    icon: 'gamepad-2',      color: '#a855f7', label: 'Dev Break',        badge: 'FUN' },
 ];
 
-const recentActivity = [
-  { icon: 'shield-check',  color: '#10b981', msg: 'Security scan completed — 0 threats',        time: '2m ago' },
-  { icon: 'cloud-upload',  color: '#38bdf8', msg: 'Cloud backup synced — 14.2 MB uploaded',     time: '18m ago' },
-  { icon: 'bot',           color: '#f59e0b', msg: 'AI Node: Qwen2.5-Coder model loaded',        time: '1h ago' },
-  { icon: 'key-round',     color: '#a855f7', msg: 'SSH key "prod-server" added to vault',       time: '3h ago' },
-  { icon: 'disc',          color: '#06b6d4', msg: 'Ventoy updated to v1.0.99',                  time: '1d ago' },
-];
+const recentActivity = [];
 
 function getStatCards(lang) {
+  const state = store.getState();
+  const vaultCount = state.vaultProjects.length;
+  const installedToolsCount = state.portableTools.filter(t => t.installed).length;
+  const activeDrivesCount = state.drives.length;
+
   return [
-    { label: 'Active Modules',  value: '18',    unit: '/ 18',  icon: 'layers',      color: '#38bdf8', pct: 100 },
-    { label: 'Vault Files',     value: '47',    unit: 'files', icon: 'shield-lock', color: '#10b981', pct: 47  },
-    { label: 'USB Health',      value: '94',    unit: '%',     icon: 'activity',    color: '#a855f7', pct: 94  },
-    { label: 'AI Models',       value: '3',     unit: 'local', icon: 'bot',         color: '#f59e0b', pct: 60  },
+    { label: 'Modül Durumu',    value: '18',                      unit: 'Aktif',  icon: 'layers',      color: '#38bdf8', pct: 100 },
+    { label: 'Kasa Dosyaları',  value: String(vaultCount),        unit: 'dosya',  icon: 'shield-lock', color: '#10b981', pct: Math.min(vaultCount * 10, 100) },
+    { label: 'Takılı Sürücüler',value: String(activeDrivesCount), unit: 'sürücü', icon: 'hard-drive',  color: '#a855f7', pct: activeDrivesCount > 0 ? 100 : 0 },
+    { label: 'Yüklü Araçlar',   value: String(installedToolsCount), unit: 'paket',  icon: 'box',         color: '#f59e0b', pct: Math.min(installedToolsCount * 12, 100) },
   ];
 }
 
