@@ -25,8 +25,12 @@ import { renderNetworkScanner } from './components/NetworkScanner.js';
 import { renderDriveModal, renderExplorerModal, renderQrModal } from './components/Modals.js';
 import { renderOnboardingModal } from './components/OnboardingModal.js';
 import { runFullSystemTest } from './test_runner.js';
+import { syncNativeDrives, isDesktopMode } from './native-bridge.js';
 
 function initApp() {
+  // Sync native physical drives if running in Electron
+  syncNativeDrives();
+
   const headerEl = document.getElementById('app-header');
   const sidebarEl = document.getElementById('app-sidebar');
   const contentEl = document.getElementById('app-content');
