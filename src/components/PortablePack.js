@@ -91,15 +91,42 @@ export function renderPortablePack(container) {
   document.getElementById('btn-generate-launcher')?.addEventListener('click', () => {
     const driveLetter = drive.letter;
     const batContent = `@echo off
-:: N.E.X.U.S. Portable Environment Launcher
+:: N.E.X.U.S. Portable Environment Launcher v3.2
 title N.E.X.U.S. Portable Environment - ${driveLetter}
-echo [N.E.X.U.S.] Starting Portable Environment...
+color 0A
+echo ===================================================
+echo [N.E.X.U.S.] Portable Gelistirme Ortami Baslatiliyor...
+echo ===================================================
+echo.
 
 set NEXUS_DRIVE=%~dp0
 set PATH=%NEXUS_DRIVE%Portable\\Git-Portable\\cmd;%NEXUS_DRIVE%Portable\\NodeJS-Portable;%NEXUS_DRIVE%Portable\\Python-Portable;%PATH%
 
-start "" "%NEXUS_DRIVE%Portable\\VSCode-Portable\\Code.exe" --user-data-dir "%NEXUS_DRIVE%Portable\\VSCode-Portable\\data"
-echo [SUCCESS] N.E.X.U.S. Environment Active!
+if exist "%NEXUS_DRIVE%Portable\\VSCode-Portable\\Code.exe" (
+    echo [OK] Portable VS Code bulundu, baslatiliyor...
+    start "" "%NEXUS_DRIVE%Portable\\VSCode-Portable\\Code.exe" --user-data-dir "%NEXUS_DRIVE%Portable\\VSCode-Portable\\data"
+) else (
+    echo [BILGI] Portable VSCode "%NEXUS_DRIVE%Portable\\VSCode-Portable\\Code.exe" bulunamadi.
+    echo [KONTROL] Yerel sistemdeki varsayilan VS Code kontrol ediliyor...
+    where code.cmd >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo [OK] Sistemdeki VS Code bulundu, baslatiliyor...
+        start "" code.cmd .
+    ) else if exist "%LocalAppData%\\Programs\\Microsoft VS Code\\Code.exe" (
+        echo [OK] Sistemdeki VS Code (%LocalAppData%) baslatiliyor...
+        start "" "%LocalAppData%\\Programs\\Microsoft VS Code\\Code.exe" .
+    ) else if exist "C:\\Program Files\\Microsoft VS Code\\Code.exe" (
+        echo [OK] Sistemdeki VS Code (Program Files) baslatiliyor...
+        start "" "C:\\Program Files\\Microsoft VS Code\\Code.exe" .
+    ) else (
+        echo.
+        echo [UYARI] Ne Portable ne de kurulu VS Code bulunamadi.
+        echo Lutfen VS Code Portable paketini USB'nizdeki Portable\\VSCode-Portable\\ klasorune ekleyin.
+    )
+)
+
+echo.
+echo [SUCCESS] N.E.X.U.S. Cevresi Aktif!
 pause
 `;
     const blob = new Blob([batContent], { type: 'text/plain;charset=utf-8' });
@@ -110,6 +137,6 @@ pause
     a.click();
     URL.revokeObjectURL(url);
 
-    store.addLog('success', 'N.E.X.U.S. launcher script downloaded.');
+    store.addLog('success', 'N.E.X.U.S. akıllı başlatıcı scripti indirildi.');
   });
 }
