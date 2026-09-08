@@ -162,7 +162,21 @@ class Store {
   }
 
   getActiveDrive() {
-    return this.state.drives.find(d => d.id === this.state.activeDriveId) || this.state.drives[0];
+    if (this.state.drives && this.state.drives.length > 0) {
+      return this.state.drives.find(d => d.id === this.state.activeDriveId) || this.state.drives[0];
+    }
+    return {
+      id: 'nexus_usb_live',
+      name: 'N.E.X.U.S. USB DISK',
+      letter: 'USB',
+      totalBytes: 64000000000,
+      usedBytes: 1200000000,
+      filesystem: 'FAT32 / exFAT',
+      isVentoyInstalled: false,
+      ventoyVersion: null,
+      isEncrypted: false,
+      files: []
+    };
   }
 
   addLog(level, msg) {

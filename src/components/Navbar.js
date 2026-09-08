@@ -6,11 +6,13 @@ import { runFullSystemTest } from '../test_runner.js';
 export function renderNavbar(container) {
   const state = store.getState();
   const lang = state.activeLang;
-  const drive = store.getActiveDrive();
+  const drive = store.getActiveDrive() || {};
+  const total = drive.totalBytes || 64000000000;
+  const used = drive.usedBytes || 0;
 
-  const usedPercent = Math.round((drive.usedBytes / drive.totalBytes) * 100);
-  const usedGB = (drive.usedBytes / 1e9).toFixed(1);
-  const totalGB = (drive.totalBytes / 1e9).toFixed(0);
+  const usedPercent = Math.round((used / total) * 100);
+  const usedGB = (used / 1e9).toFixed(1);
+  const totalGB = (total / 1e9).toFixed(0);
 
   container.innerHTML = `
     <!-- Hamburger Menu (mobile only) -->
