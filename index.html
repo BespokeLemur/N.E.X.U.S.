@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>N.E.X.U.S. — Portable Dev &amp; Security Ecosystem</title>
+    <meta name="description" content="N.E.X.U.S. — Native Environment for Xero-trace Usb Systems. 18-module portable developer and security ecosystem. Run from USB, no installation required." />
+    <meta name="keywords" content="nexus, portable dev, usb ecosystem, security scanner, offline AI, ventoy" />
+    <meta name="author" content="BespokeLemur" />
+
+    <!-- PWA & Theme -->
+    <meta name="theme-color" content="#38bdf8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="N.E.X.U.S." />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="N.E.X.U.S. — Portable Dev &amp; Security Ecosystem" />
+    <meta property="og:description" content="18-module portable developer and security ecosystem. Run from USB." />
+    <meta property="og:type" content="website" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobile-sidebar-overlay" onclick="document.getElementById('app-sidebar').classList.remove('sidebar-open');this.classList.remove('active');" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:199;backdrop-filter:blur(4px);"></div>
+
+    <div id="app" class="app-container">
+      <!-- Top Navigation & Drive Status Header -->
+      <header class="app-header" id="app-header">
+        <!-- Built by Navbar JS -->
+      </header>
+
+      <!-- Main Workspace -->
+      <main class="app-body">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="app-sidebar">
+          <!-- Navigation Items -->
+        </aside>
+
+        <!-- Dynamic Content View -->
+        <section class="app-content" id="app-content">
+          <!-- Rendered Active Tab Content -->
+        </section>
+      </main>
+
+      <!-- Terminal Drawer -->
+      <footer class="app-terminal-drawer" id="terminal-drawer">
+        <!-- Built by Terminal JS -->
+      </footer>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div id="modal-container" class="modal-container">
+        <!-- Dynamic Modal Content -->
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
